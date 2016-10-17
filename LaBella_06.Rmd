@@ -1,0 +1,167 @@
+---
+title: "LaBella_06"
+author: "Rachel LaBella"
+date: "10/16/2016"
+output: html_document
+---
+###Libraries
+```{r, echo=TRUE}
+library(tidyverse)
+library(broom)
+library(modelr)
+```
+
+###Problem 19
+```{r, echo=TRUE}
+grass <- read_csv("./chap17q19GrasslandNutrientsPlantSpecies.csv")
+str(grass)
+grass_lm <- lm(nutrients ~ species, data = grass)
+grass_plot <- ggplot(grass, aes(species, nutrients))
+
+plot(grass_lm, which = 1)
+plot(grass_lm, which = 2)
+
+grass_plot +
+  stat_smooth(method=lm, formula=y~x)
+
+res_grass <- residuals(grass_lm)
+hist(res_grass)
+anova(grass_lm)
+summary(grass_lm)
+```
+
+####19a.
+Draw a scatter plot of the data. Which variable should be X (explanatory) and which Y (response).
+```{r, echo=TRUE}
+ggplot(grass, aes(nutrients, species)) +
+  geom_point() 
+```
+
+The X variable should be the nutrients, that is what you're physically changing for the experiment
+
+The Y variable or the response variable is the number of species. It is dependent on the number of nutrients you are changing. 
+
+####19b.
+What is the rate of change in the number of plant species supported per nutrient type added? Provide a standard error for your estimate.
+```{r, echo=TRUE}
+grass_lm
+summary(grass_lm)
+```
+The rate of change (or the slope of the line of best fit) is -3.339. There is a negative correlation between the number of nutrients added and the number of speices in each plot. As the nutrients increase, the number of species decreases. 
+
+The standard error for the intercept is 2.599, the stardard error for the slope is 1.098. 
+
+All of this information is found in the linear model and summarizing the linear model dataframe. 
+
+####19c.
+Add the least-squares regression line to your scatter plot. What fraction of variation in the number of plant species is explained by the number of nutrients added?
+```{r, echo=TRUE}
+ggplot(grass_lm, mapping = aes(nutrients, species)) +
+  geom_point() +
+  stat_smooth(method=lm, formula=y~x)
+
+plot(grass_lm, which=4)
+res_grass <- residuals(grass_lm)
+hist(res_grass)
+
+```
+Roughly 70% of our variation is explained but the number of nutrients added. 7/10 points fall within our confidence intervals. The other three are outliers. If we look at the cooks distance, which shows the distance of the outliers to the mean, there are three residuals that are of significant distance from the mean. 
+
+####19d.
+Test the null hypothesis of no treatment effect on the number of plant species. 
+```{r, echo=TRUE}
+grass_lm
+anova(grass_lm)
+summary(grass_lm)
+```
+Again lets look at the results from the anova test and the summary of our grass linear model. 
+
+If the null hypothesis were true, the population regression line would be flat with a slope of zero. If the null is false, we would expect the regression mean square (nutrients) to exceed the residual mean square. This is confirmed by having an F-value greater than 1 (9.24) and a p-value of 0.016. 
+
+###Problem 24
+```{r, echo=TRUE}
+penguins <- read_csv("./chap17q24PenguinTreadmill.csv")
+str(penguins)
+penguins_plot <- ggplot(penguins, aes(group, slope)) +
+  geom_point()
+
+penguin_mod <- lm(slope ~ group, data = penguins)
+
+plot(penguin_mod, which=1)
+plot(penguin_mod, which=2)
+
+anova(penguin_mod)
+summary(penguin_mod)
+
+penguins_plot + stat_smooth(method=lm, formula=y~x)
+
+```
+Interperting the Results:
+The mean square values for the group vs the residuals are very similar resulting in an F-value of less than one and a P-value of 0.47. This means we cannot reject the null hypothesis. Our null hypothesis is that there is no difference in heart rate between the three different penquin types. 
+
+
+####Problem 24a
+Calculate the mean, sd, and sample size of the slope for penguins in each of the three groups. Display your results in a table. 
+```{r, echo=TRUE}
+
+
+```
+
+
+####Problem 24b
+Test whether the means of the slopes are equal between the three groups.
+```{r, echo=TRUE}
+
+```
+
+
+
+###Problem 25
+```{r, echo=TRUE}
+beetles <- read_csv("./chap17q25BeetleWingsAndHorns.csv")
+str(beetles)
+beetles_plot <- ggplot(beetles, aes(hornSize, wingMass)) + geom_point()
+beetles_plot
+
+beetles_mod <- lm(wingMass ~ hornSize, data = beetles)
+
+plot(beetles_mod, which=1)
+plot(beetles_mod, which=2)
+
+anova(beetles_mod)
+summary(beetles_mod)
+
+beetles_plot + stat_smooth(method=lm, formula=y~x)
+
+
+```
+
+####25a
+Use results to calculate the residuals
+```{r, echo=TRUE}
+
+residuals(beetles_mod)
+beetles <- beetles %>%
+  add_residuals(beetles_mod) %>%
+  add_predictions(beetles_mod)
+
+```
+
+
+####25b
+Use results from part a to produce a residual plot.
+```{r, echo=TRUE}
+
+plot(beetles_mod, which=1)
+
+```
+
+####25c
+Uce graph provided and your residual plot to evaluate the main assumptions of linear regression.
+
+The residual plot has a sharp peak to it and the linear plot in the textbook does not look fitted well, there are many outliers. Taking this into account, the linear regression model might not be the best fit for this data frame. We should look into using a quadratic model for the data. 
+
+####25d
+In light of your conclusion in part c, what steps should be taken?
+
+The next step should be to look at different models, ie. quadratic, to see if it fits the data better. 
