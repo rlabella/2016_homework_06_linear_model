@@ -65,6 +65,8 @@ res_grass <- residuals(grass_lm)
 hist(res_grass)
 
 ```
+
+
 Roughly 70% of our variation is explained but the number of nutrients added. 7/10 points fall within our confidence intervals. The other three are outliers. If we look at the cooks distance, which shows the distance of the outliers to the mean, there are three residuals that are of significant distance from the mean. 
 
 ####19d.
@@ -96,6 +98,8 @@ summary(penguin_mod)
 penguins_plot + stat_smooth(method=lm, formula=y~x)
 
 ```
+
+
 Interperting the Results:
 The mean square values for the group vs the residuals are very similar resulting in an F-value of less than one and a P-value of 0.47. This means we cannot reject the null hypothesis. Our null hypothesis is that there is no difference in heart rate between the three different penquin types. 
 
@@ -103,7 +107,20 @@ The mean square values for the group vs the residuals are very similar resulting
 ####Problem 24a
 Calculate the mean, sd, and sample size of the slope for penguins in each of the three groups. Display your results in a table. 
 ```{r, echo=TRUE}
+BM <- c(0.31, 0.34, 0.30, 0.38, 0.35, 0.33, 0.32, 0.32, 0.37)
+BF <- c(0.30, 0.32, 0.23, 0.38, 0.31, 0.26, 0.42, 0.28, 0.35)
+MF <- c(0.25, 0.41, 0.32, 0.34, 0.27, 0.23)
 
+samp_size_MF <- c(6)
+samp_size_BF <- c(9)
+samp_size_BM <- c(9)
+
+means <- c(mean(BM), mean(BF), mean(MF))
+sds <- c(sd(BM), sd(BF), sd(MF))
+samps <- c(samp_size_BM, samp_size_BF, samp_size_MF)
+
+penguin_df <- data.frame(mean = means, sd = sds, samp_size = samps)
+penguin_df
 
 ```
 
@@ -112,8 +129,11 @@ Calculate the mean, sd, and sample size of the slope for penguins in each of the
 Test whether the means of the slopes are equal between the three groups.
 ```{r, echo=TRUE}
 
+penguin_df
+
 ```
 
+You can see in our penguin data frame that the mean of the regression slopes are all slightly different. 
 
 
 ###Problem 25
@@ -140,7 +160,7 @@ beetles_plot + stat_smooth(method=lm, formula=y~x)
 Use results to calculate the residuals
 ```{r, echo=TRUE}
 
-residuals(beetles_mod)
+beetle_res <- residuals(beetles_mod)
 beetles <- beetles %>%
   add_residuals(beetles_mod) %>%
   add_predictions(beetles_mod)
@@ -151,17 +171,17 @@ beetles <- beetles %>%
 ####25b
 Use results from part a to produce a residual plot.
 ```{r, echo=TRUE}
-
-plot(beetles_mod, which=1)
-
+ggplot(data=beetles, aes(wingMass, beetle_res)) +
+  geom_point() +
+  stat_smooth(method=lm, formula=y~x)
 ```
 
 ####25c
 Uce graph provided and your residual plot to evaluate the main assumptions of linear regression.
 
-The residual plot has a sharp peak to it and the linear plot in the textbook does not look fitted well, there are many outliers. Taking this into account, the linear regression model might not be the best fit for this data frame. We should look into using a quadratic model for the data. 
+The residual plot has a sharp peak to it and the linear plot in the textbook does not look fitted well, there are many outliers. Taking this into account, the linear regression model might not be the best fit for this data frame. We should look into using a quadratic model for the data or try log transform the data.  
 
 ####25d
 In light of your conclusion in part c, what steps should be taken?
 
-The next step should be to look at different models, ie. quadratic, to see if it fits the data better. 
+The next step should be to look at different models, ie. quadratic, to see if it fits the data better. In addition, try log transforming the data. 
