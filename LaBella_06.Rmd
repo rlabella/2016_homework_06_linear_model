@@ -81,46 +81,16 @@ Again lets look at the results from the anova test and the summary of our grass 
 If the null hypothesis were true, the population regression line would be flat with a slope of zero. If the null is false, we would expect the regression mean square (nutrients) to exceed the residual mean square. This is confirmed by having an F-value greater than 1 (9.24) and a p-value of 0.016. 
 
 ###Problem 24
-```{r, echo=TRUE}
-penguins <- read_csv("./chap17q24PenguinTreadmill.csv")
-str(penguins)
-penguins_plot <- ggplot(penguins, aes(group, slope)) +
-  geom_point()
-
-penguin_mod <- lm(slope ~ group, data = penguins)
-
-plot(penguin_mod, which=1)
-plot(penguin_mod, which=2)
-
-anova(penguin_mod)
-summary(penguin_mod)
-
-penguins_plot + stat_smooth(method=lm, formula=y~x)
-
-```
-
-
-Interperting the Results:
-The mean square values for the group vs the residuals are very similar resulting in an F-value of less than one and a P-value of 0.47. This means we cannot reject the null hypothesis. Our null hypothesis is that there is no difference in heart rate between the three different penquin types. 
-
-
 ####Problem 24a
 Calculate the mean, sd, and sample size of the slope for penguins in each of the three groups. Display your results in a table. 
 ```{r, echo=TRUE}
-BM <- c(0.31, 0.34, 0.30, 0.38, 0.35, 0.33, 0.32, 0.32, 0.37)
-BF <- c(0.30, 0.32, 0.23, 0.38, 0.31, 0.26, 0.42, 0.28, 0.35)
-MF <- c(0.25, 0.41, 0.32, 0.34, 0.27, 0.23)
 
-samp_size_MF <- c(6)
-samp_size_BF <- c(9)
-samp_size_BM <- c(9)
+penguins <- read_csv("./chap17q24PenguinTreadmill.csv")
+str(penguins)
 
-means <- c(mean(BM), mean(BF), mean(MF))
-sds <- c(sd(BM), sd(BF), sd(MF))
-samps <- c(samp_size_BM, samp_size_BF, samp_size_MF)
-
-penguin_df <- data.frame(mean = means, sd = sds, samp_size = samps)
-penguin_df
+penguin_grp <- penguins %>%
+  group_by(group) %>%
+  summarize(mean_slope = mean(slope), sd_slope = sd(slope), samp_size = length(group))
 
 ```
 
@@ -129,12 +99,22 @@ penguin_df
 Test whether the means of the slopes are equal between the three groups.
 ```{r, echo=TRUE}
 
-penguin_df
+penguin_mod <- lm(slope~group, data=penguins)
+anova(penguin_mod)
+plot(penguin_mod, which = 1)
+plot(penguin_mod, which = 2)
+
+penguin_resid <- residuals(penguin_mod)
+hist(penguin_resid)
+
+ggplot(penguins, aes(group, slope)) +
+  geom_boxplot() +
+  geom_point()
+
 
 ```
 
-You can see in our penguin data frame that the mean of the regression slopes are all slightly different. 
-
+Looking at the mean squares, they are almost identical creating an F value under 1 and a high p-value. This means we fail to reject the null that there is no difference between the means of the regression slopes. 
 
 ###Problem 25
 ```{r, echo=TRUE}
